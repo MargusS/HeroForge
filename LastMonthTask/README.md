@@ -1,4 +1,4 @@
-# TaskList Forge App
+# LastMonthTask Forge App
 
 This Forge app adds a Jira global page where you can select a project and list tasks created in the last 30 days.
 

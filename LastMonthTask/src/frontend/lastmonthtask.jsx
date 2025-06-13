@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ForgeReconciler from '@forge/react';
 import { invoke } from '@forge/bridge';
 
-const TaskListApp = () => {
+const LastMonthTaskApp = () => {
   const [projects, setProjects] = useState([]);
   const [selected, setSelected] = useState('');
   const [tasks, setTasks] = useState([]);
@@ -22,7 +22,7 @@ const TaskListApp = () => {
 
   return (
     <div>
-      <h1>Task List</h1>
+      <h1>Last Month Task</h1>
       <select value={selected} onChange={(e) => setSelected(e.target.value)}>
         <option value="" disabled>Select a project</option>
         {projects.map((p) => (
@@ -39,4 +39,4 @@ const TaskListApp = () => {
   );
 };
 
-ForgeReconciler.render(<TaskListApp />);
+ForgeReconciler.render(<LastMonthTaskApp />);

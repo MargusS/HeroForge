@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "eslint src/**/*"
+    "lint": "eslint -c .eslintrc.json src/**/*"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

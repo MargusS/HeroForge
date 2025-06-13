@@ -1,6 +1,6 @@
-# Forge Hello World
+# Task List Forge App
 
-This project contains a Forge app written in Javascript that displays `Hello World!` in a Jira issue panel. 
+This project contains a Forge app written in JavaScript that shows issues from a selected Jira project in an issue panel. Users can choose a project from a dropdown and the app lists tasks updated in the last 30 days.
 
 See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
 

@@ -1,14 +1,14 @@
 modules:
   jira:issuePanel:
-    - key: hello-forge-hello-world-issue-panel
+    - key: tasklist-issue-panel
       resource: main
       resolver:
-        function: resolver
+        function: tasklist-resolver
       render: native
-      title: Hello Forge
+      title: Project Tasks
       icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
   function:
-    - key: resolver
+    - key: tasklist-resolver
       handler: index.handler
 resources:
   - key: main

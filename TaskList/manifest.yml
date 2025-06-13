@@ -1,0 +1,20 @@
+modules:
+  jira:globalPage:
+    - key: tasklist-global-page
+      resource: tasklist
+      resolver:
+        function: resolver
+      render: native
+      title: Task List
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: tasklist
+    path: src/frontend/tasklist.jsx
+app:
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/09c5fe00-9133-4649-9fa8-9be9c6295a5a

@@ -19,6 +19,9 @@ See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/)
 forge deploy
 ```
 
+Make sure you run `npm install` in this directory before deploying so Forge can
+resolve the required dependencies like `@forge/api`.
+
 - Install your app in an Atlassian site by running:
 ```
 forge install

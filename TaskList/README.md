@@ -32,6 +32,12 @@ forge install
 forge tunnel
 ```
 
+### Troubleshooting
+
+If `forge deploy` fails with an error like `Can't resolve '@forge/resolver'` or
+`Can't resolve '@forge/api'`, make sure that you ran `npm install` in this
+directory. The bundler needs the packages in `node_modules` to build the app.
+
 ### Notes
 - Use the `forge deploy` command when you want to persist code changes.
 - Use the `forge install` command when you want to install the app on a new site.

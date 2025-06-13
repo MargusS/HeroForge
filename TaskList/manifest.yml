@@ -1,12 +1,12 @@
 modules:
-  jira:issuePanel:
-    - key: tasklist-issue-panel
+  jira:globalPage:
+    - key: tasklist-page
       resource: main
       resolver:
         function: tasklist-resolver
       render: native
       title: Project Tasks
-      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+      icon: https://developer.atlassian.com/platform/forge/images/icons/app-default-icon.png
   function:
     - key: tasklist-resolver
       handler: index.handler

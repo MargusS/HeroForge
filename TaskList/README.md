@@ -1,8 +1,9 @@
 # Task List Forge App
 
-This project contains a Forge app written in JavaScript that shows issues from a selected Jira project in an issue panel. Users can choose a project from a dropdown and the app lists tasks updated in the last 30 days.
+This project contains a Forge app written in JavaScript that shows issues from a selected Jira project in a global page. On this page, users can choose a project from a dropdown and the app lists tasks updated in the last 30 days.
 
 See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
+The page appears in Jira's Apps menu under the name **Task List**.
 
 ## Requirements
 

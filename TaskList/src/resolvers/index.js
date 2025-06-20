@@ -3,6 +3,7 @@ import api, { route } from "@forge/api";
 
 const resolver = new Resolver();
 
+// Obtener lista de proyectos disponibles para el usuario
 resolver.define("getProjects", async () => {
   try {
     const response = await api
@@ -15,121 +16,83 @@ resolver.define("getProjects", async () => {
   }
 });
 
-function isWithinLast30Days(dateString) {
-  const now = new Date();
-  const date = new Date(dateString);
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(now.getDate() - 30);
-  return date >= thirtyDaysAgo;
+// Devuelve el primer y último día del mes especificado
+function getDateRangeForMonth(year, month) {
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  return { firstDay, lastDay };
 }
 
-async function fetchAllIssues(jql, fields) {
-  const maxResults = 100;
-  let startAt = 0;
-  let total = 0;
-  const allIssues = [];
-
-  do {
-    const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jql,
-        startAt,
-        maxResults,
-        fields,
-      }),
-    });
-
-    const data = await response.json();
-    const issues = data.issues || [];
-
-    allIssues.push(...issues);
-    startAt += maxResults;
-    total = data.total;
-  } while (startAt < total);
-
-  return allIssues;
+// Devuelve el primer día del mes anterior en formato ISO
+function getStartDateForPreviousMonth(year, month) {
+  const fromDate = new Date(
+    Date.UTC(month === 1 ? year - 1 : year, month === 1 ? 11 : month - 2, 1)
+  );
+  return fromDate.toISOString().split("T")[0];
 }
 
+// Recupera tareas con worklogs en el mes seleccionado, por lotes
 resolver.define("getIssuesWithRecentWorklogsBatch", async ({ payload }) => {
-  try {
-    const { projectKey, startAt = 0, batchSize = 50 } = payload;
-    const { value } = projectKey;
-    if (!projectKey) return [];
+  const { projectKey, startAt, batchSize, month, year } = payload;
+  const { value } = projectKey;
 
-    const jql = `project = "${value}" ORDER BY updated DESC`;
+  if (!value) return [];
 
-    const fields = [
-      "summary",
-      "parent",
-      "issuetype",
-      "project",
-      "subtasks",
-      "customfield_10154", // Billing Type
-      "customfield_10882", // Helpdesk
-      "customfield_10386", // Requesting project
-      "customfield_10221", // SOW Number
-    ];
+  const fromDate = getStartDateForPreviousMonth(year, month);
 
-    const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        jql,
-        startAt,
-        maxResults: batchSize,
-        fields,
-      }),
-    });
+  const jql = `project = "${value}" AND created >= "${fromDate}" ORDER BY key DESC`;
+  const fields = [
+    "summary",
+    "project",
+    "issuetype",
+    "customfield_10154",
+    "customfield_10882",
+    "customfield_10386",
+    "customfield_10221",
+  ];
 
-    const data = await response.json();
-    const issues = data.issues || [];
+  const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jql, startAt, maxResults: batchSize, fields }),
+  });
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const data = await response.json();
+  const issues = data.issues || [];
 
-    const filteredIssues = [];
+  const { firstDay, lastDay } = getDateRangeForMonth(year, month);
+  const filteredIssues = [];
 
-    for (const issue of issues) {
-      try {
-        const res = await api
-          .asUser()
-          .requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
-        const worklogData = await res.json();
+  for (const issue of issues) {
+    try {
+      const res = await api
+        .asUser()
+        .requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
+      const worklogData = await res.json();
 
-        const recentLogs = worklogData.worklogs.filter(
-          (log) => new Date(log.started) >= thirtyDaysAgo
-        );
+      const recentLogs = worklogData.worklogs.filter((log) => {
+        const logDate = new Date(log.started);
+        return logDate >= firstDay && logDate <= lastDay;
+      });
 
-        if (recentLogs.length > 0) {
-          filteredIssues.push({
-            key: issue.key,
-			fields: issue.fields,
-            worklogs: recentLogs,
-          });
-        }
-      } catch (err) {
-        console.error(`Error getting worklogs for ${issue.key}`, err);
+      if (recentLogs.length > 0) {
+        filteredIssues.push({
+          key: issue.key,
+          summary: issue.fields.summary,
+          fields: issue.fields,
+          worklogs: recentLogs,
+        });
       }
+    } catch (err) {
+      console.error(`Error fetching worklog for ${issue.key}:`, err);
     }
-
-    return {
-      issues: filteredIssues,
-      total: data.total,
-      nextStartAt: startAt + batchSize,
-      isLastBatch: startAt + batchSize >= data.total,
-    };
-  } catch (error) {
-    console.error("Error in searchTasks resolver:", error);
-    return [];
   }
+
+  return {
+    issues: filteredIssues,
+    total: data.total,
+    isLastBatch: startAt >= data.total,
+  };
 });
 
 export const handler = resolver.getDefinitions();

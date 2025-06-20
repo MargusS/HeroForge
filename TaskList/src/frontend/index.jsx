@@ -10,14 +10,11 @@ import ForgeReconciler, {
 } from "@forge/react";
 import { invoke } from "@forge/bridge";
 
-const batchSize = 50;
-
 const App = () => {
   const [projects, setProjects] = useState([]);
   const [project, setProject] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [startAt, setStartAt] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -34,27 +31,23 @@ const App = () => {
 
   const groupWorklogsByDay = (tasks) => {
     const result = {};
-
-	console.log(tasks)
-
     tasks.forEach((task) => {
       task.worklogs.forEach((log) => {
-        const date = log.started.split("T")[0]; // "YYYY-MM-DD"
+        const date = log.started.split("T")[0];
         if (!result[date]) result[date] = [];
-
         result[date].push({
           key: task.key,
-          summary: task.fields.summary,
+          summary: task.summary,
           user: log.author?.displayName || "Desconocido",
           time: log.timeSpent,
         });
       });
     });
-
     return result;
   };
 
   const exportDetailedWorklogsAsCSV = (tasks) => {
+    if (tasks.length === 0 || loading) return;
     const rows = [
       [
         "Time Spent",
@@ -71,10 +64,8 @@ const App = () => {
         "SOW Number",
       ],
     ];
-
     tasks.forEach((task) => {
-      const { key, summary, fields, worklogs } = task;
-
+      const { key, fields, worklogs } = task;
       worklogs.forEach((log) => {
         rows.push([
           safe(log.timeSpent),
@@ -83,7 +74,7 @@ const App = () => {
           safe(log.author?.accountId),
           safe(fields?.project?.name),
           safe(key),
-          safe(summary),
+          safe(fields?.summary),
           safe(fields?.issuetype?.name),
           safe(fields?.customfield_10154?.value),
           safe(fields?.customfield_10882),
@@ -92,11 +83,9 @@ const App = () => {
         ]);
       });
     });
-
     const csvContent = rows.map((r) => r.join(",")).join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
     link.href = url;
     link.download = `worklogs_detailed_${Date.now()}.csv`;
@@ -104,78 +93,144 @@ const App = () => {
     link.click();
     document.body.removeChild(link);
   };
-  const loadNextBatch = async () => {
-    if (!project) return;
 
+  const onSearch = async () => {
+    if (!project || !selectedMonth) return;
+    setTasks([]);
     setLoading(true);
-
     try {
-      const result = await invoke("getIssuesWithRecentWorklogsBatch", {
-        projectKey: project,
-        startAt,
-        batchSize,
-      });
-	  console.log("Result:", result);
-
-      setTasks((prev) => [...prev, ...result.issues]);
-      setStartAt(result.nextStartAt);
-      setHasMore(!result.isLastBatch);
+      let startAt = 0;
+      const batchSize = 50;
+      while (true) {
+        const result = await invoke("getIssuesWithRecentWorklogsBatch", {
+          projectKey: project,
+          year: selectedMonth.year,
+          month: selectedMonth.month,
+          startAt,
+          batchSize,
+        });
+        setTasks((prev) => [...prev, ...result.issues]);
+        if (result.isLastBatch) break;
+        startAt += batchSize;
+      }
     } catch (err) {
       console.error("Error al buscar tareas:", err);
     }
-
     setLoading(false);
   };
 
-  const onSearch = () => {
-    setTasks([]);
-    setStartAt(0);
-    setHasMore(false);
-    loadNextBatch();
-  };
+  const monthOptions = (() => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const options = [];
+    for (let y = currentYear - 1; y <= currentYear; y++) {
+      const startMonth = 0;
+      const endMonth = y === currentYear ? currentMonth : 11;
+      for (let m = startMonth; m <= endMonth; m++) {
+        const date = new Date(Date.UTC(y, m, 1));
+        const label = date.toLocaleString("es-ES", { month: "long" });
+        options.push({
+          label: `${label.charAt(0).toUpperCase() + label.slice(1)} ${y}`,
+          value: `${y}-${(m + 1).toString().padStart(2, "0")}`,
+        });
+      }
+    }
+    return options.reverse();
+  })();
 
   const grouped = groupWorklogsByDay(tasks);
+  const canSearch = !!project && !!selectedMonth && !loading;
+  const canExport = tasks.length > 0 && !loading;
 
   return (
     <>
-      {console.log(tasks)}
-      <Label labelFor="project-select">Proyecto</Label>
-      <Select
-        id="project-select"
-        options={projects.map((p) => ({ label: p.name, value: p.key }))}
-        onChange={(value) => {
-          setProject(value);
-          setTasks([]);
-          setStartAt(0);
-          setHasMore(false);
-        }}
-        placeholder="Selecciona un proyecto"
-      />
-      <Button onClick={onSearch} disabled={!project}>
-        Buscar tareas
-      </Button>
-      {tasks.length > 0 && (
-        <>
-          <Button onClick={() => exportDetailedWorklogsAsCSV(tasks)}>
+      <Box padding="space.200" backgroundColor="neutral.subtle">
+        <Text weight="bold" size="medium">
+          Filtros
+        </Text>
+
+        <Box marginTop="space.100" marginBottom="space.200">
+          <Label labelFor="project-select">Proyecto</Label>
+          <Select
+            id="project-select"
+            options={projects.map((p) => ({ label: p.name, value: p.key }))}
+            onChange={(value) => {
+              setProject(value);
+              setTasks([]);
+            }}
+            placeholder="Selecciona un proyecto"
+          />
+        </Box>
+
+        <Box marginBottom="space.200">
+          <Label labelFor="month-select">Mes</Label>
+          <Select
+            id="month-select"
+            options={monthOptions}
+            onChange={({ value }) => {
+              const [year, month] = value.split("-").map(Number);
+              setSelectedMonth({ year, month });
+            }}
+            placeholder="Selecciona un mes"
+          />
+        </Box>
+
+        <Box marginBottom="space.100" width="100%">
+          <Button
+            isDisabled={!canSearch}
+            appearance={canSearch ? "primary" : "default"}
+            style={{ width: "100%" }}
+            onClick={onSearch}
+          >
+            {loading ? <Spinner size="small" /> : "Buscar tareas"}
+          </Button>
+        </Box>
+
+        <Box marginBottom="space.200" width="100%">
+          <Button
+            isDisabled={!canExport}
+            appearance={canExport ? "primary" : "default"}
+            style={{ width: "100%" }}
+            onClick={() => exportDetailedWorklogsAsCSV(tasks)}
+          >
             Exportar a CSV
           </Button>
-          {hasMore && (
-            <Button onClick={loadNextBatch} disabled={loading}>
-              {loading ? <Spinner size="small" /> : "Cargar más"}
-            </Button>
-          )}
-        </>
+        </Box>
+      </Box>
+
+      {loading && (
+        <Box marginTop="space.200">
+          <Text>Procesando lotes... Esto puede tardar unos segundos</Text>
+        </Box>
       )}
-      <Box>
+
+      {!loading && tasks.length === 0 && selectedMonth && project && (
+        <Box marginTop="space.200">
+          <Text>
+            No se encontraron tareas con worklogs en el mes seleccionado.
+          </Text>
+        </Box>
+      )}
+
+      <Box marginTop="space.300">
         {Object.entries(grouped)
-          .sort(([a], [b]) => new Date(a) - new Date(b))
+          .sort(([a], [b]) => new Date(b) - new Date(a))
           .map(([date, entries]) => (
-            <Box key={date} style={{ marginBottom: "16px" }}>
+            <Box
+              key={date}
+              padding="space.200"
+              marginBottom="space.150"
+              borderWidth="1"
+              borderColor="neutral"
+              borderRadius="medium"
+              backgroundColor="neutral.subtle"
+            >
               <Text weight="bold">{date}</Text>
               {entries.map((entry, index) => (
-                <Box key={index} style={{ paddingLeft: "12px" }}>
-                  <Text>{`${entry.key} - ${entry.summary} | ${entry.user} | ${entry.time}`}</Text>
-                </Box>
+                <Text key={index} size="small" style={{ marginLeft: 12 }}>
+                  {`${entry.key} - ${entry.summary} | ${entry.user} | ${entry.time}`}
+                </Text>
               ))}
             </Box>
           ))}

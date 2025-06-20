@@ -1,6 +1,7 @@
-# Forge Hello World
+# TaskList
 
-This project contains a Forge app written in JavaScript that displays `Hello World!` in a Jira global page.
+This Forge app displays a global page in Jira where users can select one of their
+projects and search for tasks updated in the last 30 days.
 
 See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
 

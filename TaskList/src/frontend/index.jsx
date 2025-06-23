@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import ForgeReconciler, {
   Text,
   Select,
-  Option,
   Button,
   Box,
+  Inline,
   Label,
-  Spinner,
+  LoadingButton,
 } from "@forge/react";
 import { invoke } from "@forge/bridge";
 
@@ -145,12 +145,12 @@ const App = () => {
 
   return (
     <>
-      <Box padding="space.200" backgroundColor="neutral.subtle">
+      <Box backgroundColor="neutral.subtle">
         <Text weight="bold" size="medium">
           Filtros
         </Text>
 
-        <Box marginTop="space.100" marginBottom="space.200">
+        <Box paddingBlockEnd="space.200">
           <Label labelFor="project-select">Proyecto</Label>
           <Select
             id="project-select"
@@ -163,7 +163,7 @@ const App = () => {
           />
         </Box>
 
-        <Box marginBottom="space.200">
+        <Box paddingBlockEnd="space.200">
           <Label labelFor="month-select">Mes</Label>
           <Select
             id="month-select"
@@ -176,27 +176,31 @@ const App = () => {
           />
         </Box>
 
-        <Box marginBottom="space.100" width="100%">
+        <Inline space="space.100" alignBlock="center" alignInline="end">
+          {!loading && (
+            <Button
+              padding="space.200"
+              isDisabled={!canSearch}
+              appearance={canSearch ? "primary" : "default"}
+              onClick={onSearch}
+            >
+              Buscar tareas
+            </Button>
+          )}
+          {loading && (
+            <LoadingButton appearance="primary" isLoading>
+              Loading button
+            </LoadingButton>
+          )}
           <Button
-            isDisabled={!canSearch}
-            appearance={canSearch ? "primary" : "default"}
-            style={{ width: "100%" }}
-            onClick={onSearch}
-          >
-            {loading ? <Spinner size="small" /> : "Buscar tareas"}
-          </Button>
-        </Box>
-
-        <Box marginBottom="space.200" width="100%">
-          <Button
+            paddingTop="space.200"
             isDisabled={!canExport}
             appearance={canExport ? "primary" : "default"}
-            style={{ width: "100%" }}
             onClick={() => exportDetailedWorklogsAsCSV(tasks)}
           >
             Exportar a CSV
           </Button>
-        </Box>
+        </Inline>
       </Box>
 
       {loading && (
@@ -219,7 +223,6 @@ const App = () => {
           .map(([date, entries]) => (
             <Box
               key={date}
-              padding="space.200"
               marginBottom="space.150"
               borderWidth="1"
               borderColor="neutral"

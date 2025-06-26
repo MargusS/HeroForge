@@ -45,6 +45,7 @@ resolver.define("getIssuesWithRecentWorklogsBatch", async ({ payload }) => {
     "summary",
     "project",
     "issuetype",
+	"parent",
     "customfield_10154",
     "customfield_10882",
     "customfield_10386",

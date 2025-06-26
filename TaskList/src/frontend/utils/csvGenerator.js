@@ -1,4 +1,5 @@
-import { parseTimeSpentToDecimal } from "./TimeSpentFormatter";
+import { parseTimeSpentToDecimal } from "./timeSpentFormatter.js";
+import { getReferenceKeyAndSummary } from "./epicReferenceFormatter.js";
 
 const safe = (val) => {
   const str = val ? String(val) : "";
@@ -28,7 +29,13 @@ export const exportDetailedWorklogsAsCSV = (tasks) => {
     ],
   ];
 
-  tasks.forEach(({ key, fields, worklogs }) => {
+  tasks.forEach((task) => {
+    const { key: keyReference, summary: summaryReference } =
+      getReferenceKeyAndSummary(task, tasks);
+    const fields = task.fields || {};
+    const worklogs = task.worklogs || [];
+	console.log("Processing task:",task);
+	console.log("Fields:", fields);
     worklogs.forEach((log) => {
       rows.push([
         safe(parseTimeSpentToDecimal(log.timeSpent)),
@@ -36,8 +43,8 @@ export const exportDetailedWorklogsAsCSV = (tasks) => {
         safe(log.author?.displayName),
         safe(log.author?.accountId),
         safe(fields?.project?.name),
-        safe(key),
-        safe(fields?.summary),
+        safe(keyReference),
+        safe(summaryReference),
         safe(fields?.issuetype?.name),
         safe(fields?.customfield_10154?.value),
         safe(fields?.customfield_10882),

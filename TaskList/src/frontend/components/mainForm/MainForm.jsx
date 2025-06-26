@@ -6,14 +6,8 @@ import { useSearchContext } from "../../context/SearchContext";
 import { exportDetailedWorklogsAsCSV } from "../../utils/csvGenerator";
 
 const MainForm = ({ projects, monthOptions, onSearch }) => {
-  const {
-    setProject,
-    setSelectedMonth,
-    tasks,
-    loading,
-    canSearch,
-    canExport,
-  } = useSearchContext();
+  const { setProject, setSelectedMonth, tasks, loading, canSearch, canExport } =
+    useSearchContext();
 
   return (
     <Box backgroundColor="neutral.subtle">

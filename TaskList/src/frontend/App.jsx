@@ -4,7 +4,7 @@ import MainForm from "./components/mainForm/MainForm";
 import TaskListWrapper from "./components/taskListWrapper/TaskListWrapper";
 import useMonthOptions from "./hooks/useMonthOptions";
 import { useSearchContext } from "./context/SearchContext";
-import useSearchTasks from "./hooks/useSearchContext";
+import useSearchTasks from "./hooks/useSearchTasks";
 import { sortWorklogsByDay } from "./utils/workLogSorter";
 
 const App = () => {

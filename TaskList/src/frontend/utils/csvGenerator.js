@@ -1,6 +1,9 @@
+import { parseTimeSpentToDecimal } from "./TimeSpentFormatter";
+
 const safe = (val) => {
   const str = val ? String(val) : "";
-  const needsQuotes = str.includes(",") || str.includes('"') || str.includes("\n");
+  const needsQuotes =
+    str.includes(",") || str.includes('"') || str.includes("\n");
   const escaped = str.replace(/"/g, '""');
   return needsQuotes ? `"${escaped}"` : escaped;
 };
@@ -8,25 +11,27 @@ const safe = (val) => {
 export const exportDetailedWorklogsAsCSV = (tasks) => {
   if (!tasks || tasks.length === 0) return;
 
-  const rows = [[
-    "Time Spent",
-    "Start Date",
-    "Author",
-    "Author's Account Id",
-    "Project Name",
-    "Task Key",
-    "Task Summary",
-    "Issue Type",
-    "Billing Type",
-    "Helpdesk",
-    "Requesting project",
-    "SOW Number",
-  ]];
+  const rows = [
+    [
+      "Time Spent",
+      "Start Date",
+      "Author",
+      "Author's Account Id",
+      "Project Name",
+      "Task Key",
+      "Task Summary",
+      "Issue Type",
+      "Billing Type",
+      "Helpdesk",
+      "Requesting project",
+      "SOW Number",
+    ],
+  ];
 
   tasks.forEach(({ key, fields, worklogs }) => {
     worklogs.forEach((log) => {
       rows.push([
-        safe(log.timeSpent),
+        safe(parseTimeSpentToDecimal(log.timeSpent)),
         safe(log.started?.split("T")[0]),
         safe(log.author?.displayName),
         safe(log.author?.accountId),

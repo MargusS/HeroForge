@@ -8,15 +8,14 @@ export const getIssuesWithRecentWorklogsBatch = async ({
   projectKey,
   startAt,
   batchSize,
-  month,
-  year,
+  fromDate,
+  toDate,
   billingType,
 }) => {
   const { value } = projectKey;
   if (!value) return [];
 
-  const fromDate = getStartDateForPreviousMonth(year, month);
-  const jql = `project = "${value}" AND created >= "${fromDate}" ORDER BY key DESC`;
+  let jql = `project = "${value}" AND created >= "${fromDate}" AND created <= "${toDate}" ORDER BY key DESC`;
   const fields = [
     "summary",
     "project",
@@ -37,8 +36,10 @@ export const getIssuesWithRecentWorklogsBatch = async ({
   const data = await response.json();
   const issues = data.issues || [];
 
-  const { firstDay, lastDay } = getDateRangeForMonth(year, month);
   const filteredIssues = [];
+
+  const formattedFromDate = new Date(fromDate);
+  const formattedToDate = new Date(toDate);
 
   for (const issue of issues) {
     try {
@@ -49,7 +50,7 @@ export const getIssuesWithRecentWorklogsBatch = async ({
 
       const recentLogs = worklogData.worklogs.filter((log) => {
         const logDate = new Date(log.started);
-        return logDate >= firstDay && logDate <= lastDay;
+        return logDate >= formattedFromDate && logDate <= formattedToDate;
       });
 
       if (recentLogs.length > 0) {

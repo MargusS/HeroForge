@@ -9,7 +9,7 @@ const safe = (val) => {
   return needsQuotes ? `"${escaped}"` : escaped;
 };
 
-export const exportDetailedWorklogsAsCSV = (tasks) => {
+export const exportDetailedWorklogsAsCSV = (tasks, fromDate, toDate) => {
   if (!tasks || tasks.length === 0) return;
 
   const rows = [
@@ -34,8 +34,8 @@ export const exportDetailedWorklogsAsCSV = (tasks) => {
       getReferenceKeyAndSummary(task, tasks);
     const fields = task.fields || {};
     const worklogs = task.worklogs || [];
-	console.log("Processing task:",task);
-	console.log("Fields:", fields);
+    console.log("Processing task:", task);
+    console.log("Fields:", fields);
     worklogs.forEach((log) => {
       rows.push([
         safe(parseTimeSpentToDecimal(log.timeSpent)),
@@ -59,7 +59,9 @@ export const exportDetailedWorklogsAsCSV = (tasks) => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `worklogs_detailed_${Date.now()}.csv`;
+  const formattedFrom = new Date(fromDate).toISOString().split("T")[0];
+  const formattedTo = new Date(toDate).toISOString().split("T")[0];
+  link.download = `worklogs_${formattedFrom}_to_${formattedTo}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

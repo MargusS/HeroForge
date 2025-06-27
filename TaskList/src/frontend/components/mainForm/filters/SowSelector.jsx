@@ -26,7 +26,7 @@ const SowSelector = () => {
   }));
 
   return (
-    <Box paddingBlockEnd="space.200">
+    <Box paddingBlockEnd="space.200" xcss={{ width: "100%" }}>
       <Label labelFor="sow-select">SOW</Label>
       <Select
         id="sow-select"
@@ -34,9 +34,7 @@ const SowSelector = () => {
         options={options}
         onChange={(e) => setSelectedSow(e)}
         value={selectedSow}
-        placeholder={
-          !project ? "Selecciona primero un proyecto" : "Selecciona un SOW"
-        }
+        placeholder={!project ? "Selecciona un proyecto" : "Selecciona un SOW"}
       />
     </Box>
   );

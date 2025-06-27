@@ -4,7 +4,7 @@ import { invoke } from "@forge/bridge";
 import { useSearchContext } from "../../../context/SearchContext";
 
 const BillingTypeSelector = () => {
-  const { billingType, setBillingType } = useSearchContext();
+  const { project, billingType, setBillingType } = useSearchContext();
   const [options, setOptions] = useState([]);
 
   useEffect(() => {
@@ -23,12 +23,15 @@ const BillingTypeSelector = () => {
   };
 
   return (
-    <Box paddingBlockEnd="space.200">
+    <Box paddingBlockEnd="space.200" xcss={{ width: "100%" }}>
       <Label labelFor="billing-type-select">Facturación</Label>
       <Select
         id="billing-type-select"
         label="Tipo de facturación"
-        placeholder="Selecciona una opción"
+        isDisabled={!project}
+        placeholder={
+          !project ? "Selecciona un proyecto" : "Selecciona una opción"
+        }
         onChange={handleChange}
         value={billingType}
       >

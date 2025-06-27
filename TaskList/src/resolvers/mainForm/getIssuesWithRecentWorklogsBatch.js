@@ -1,13 +1,32 @@
 import api, { route } from "@forge/api";
-import { getDateRangeForMonth, getStartDateForPreviousMonth } from "./utils/datesConverter";
+import {
+  getDateRangeForMonth,
+  getStartDateForPreviousMonth,
+} from "../utils/datesConverter";
 
-export const getIssuesWithRecentWorklogsBatch = async ({ projectKey, startAt, batchSize, month, year }) => {
+export const getIssuesWithRecentWorklogsBatch = async ({
+  projectKey,
+  startAt,
+  batchSize,
+  month,
+  year,
+  billingType,
+}) => {
   const { value } = projectKey;
   if (!value) return [];
 
   const fromDate = getStartDateForPreviousMonth(year, month);
   const jql = `project = "${value}" AND created >= "${fromDate}" ORDER BY key DESC`;
-  const fields = ["summary", "project", "issuetype", "parent", "customfield_10154", "customfield_10882", "customfield_10386", "customfield_10221"];
+  const fields = [
+    "summary",
+    "project",
+    "issuetype",
+    "parent",
+    "customfield_10154",
+    "customfield_10882",
+    "customfield_10386",
+    "customfield_10221",
+  ];
 
   const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
     method: "POST",
@@ -23,7 +42,9 @@ export const getIssuesWithRecentWorklogsBatch = async ({ projectKey, startAt, ba
 
   for (const issue of issues) {
     try {
-      const res = await api.asUser().requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
+      const res = await api
+        .asUser()
+        .requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
       const worklogData = await res.json();
 
       const recentLogs = worklogData.worklogs.filter((log) => {

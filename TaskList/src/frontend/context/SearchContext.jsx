@@ -9,6 +9,7 @@ export const SearchProvider = ({ children }) => {
   const [project, setProject] = useState("");
   const [selectedSow, setSelectedSow] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [billingType, setBillingType] = useState("ALL");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -23,6 +24,8 @@ export const SearchProvider = ({ children }) => {
       setSelectedSow,
       selectedMonth,
       setSelectedMonth,
+      billingType,
+      setBillingType,
       tasks,
       setTasks,
       loading,
@@ -30,7 +33,7 @@ export const SearchProvider = ({ children }) => {
       canSearch,
       canExport,
     }),
-    [project, selectedSow, selectedMonth, tasks, loading]
+    [project, selectedSow, selectedMonth, billingType, tasks, loading]
   );
 
   return (

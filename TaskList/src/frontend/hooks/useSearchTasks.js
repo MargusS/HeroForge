@@ -5,6 +5,7 @@ const useSearchTasks = () => {
   const {
     project,
     selectedMonth,
+	billingType,
     setTasks,
     setLoading,
   } = useSearchContext();
@@ -15,27 +16,28 @@ const useSearchTasks = () => {
     setTasks([]);
     setLoading(true);
 
-    try {
-      let startAt = 0;
-      const batchSize = 50;
+    // try {
+    //   let startAt = 0;
+    //   const batchSize = 50;
 
-      while (true) {
-        const result = await invoke("getIssuesWithRecentWorklogsBatch", {
-          projectKey: project,
-          year: selectedMonth.year,
-          month: selectedMonth.month,
-          startAt,
-          batchSize,
-        });
+    //   while (true) {
+    //     const result = await invoke("getIssuesWithRecentWorklogsBatch", {
+    //       projectKey: project,
+    //       year: selectedMonth.year,
+    //       month: selectedMonth.month,
+    //       startAt,
+	// 	  billingType,
+    //       batchSize,
+    //     });
 
-        setTasks(prev => [...prev, ...result.issues]);
+    //     setTasks(prev => [...prev, ...result.issues]);
 
-        if (result.isLastBatch) break;
-        startAt += batchSize;
-      }
-    } catch (err) {
-      console.error("Error al buscar tareas:", err);
-    }
+    //     if (result.isLastBatch) break;
+    //     startAt += batchSize;
+    //   }
+    // } catch (err) {
+    //   console.error("Error al buscar tareas:", err);
+    // }
 
     setLoading(false);
   };

@@ -8,11 +8,13 @@ export const useSearchContext = () => useContext(SearchContext);
 export const SearchProvider = ({ children }) => {
   const [project, setProject] = useState("");
   const [selectedSow, setSelectedSow] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [billingType, setBillingType] = useState("ALL");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const canSearch = !!project && !!selectedMonth && !loading;
+  const canSearch = !!project && !!fromDate && !!toDate && !loading;
   const canExport = tasks.length > 0 && !loading;
 
   const value = useMemo(
@@ -21,8 +23,12 @@ export const SearchProvider = ({ children }) => {
       setProject,
       selectedSow,
       setSelectedSow,
-      selectedMonth,
-      setSelectedMonth,
+      fromDate,
+      setFromDate,
+      toDate,
+      setToDate,
+      billingType,
+      setBillingType,
       tasks,
       setTasks,
       loading,
@@ -30,7 +36,7 @@ export const SearchProvider = ({ children }) => {
       canSearch,
       canExport,
     }),
-    [project, selectedSow, selectedMonth, tasks, loading]
+    [project, selectedSow, fromDate, toDate, billingType, tasks, loading]
   );
 
   return (

@@ -6,7 +6,7 @@ import { useSearchContext } from "../../context/SearchContext";
 import { exportDetailedWorklogsAsCSV } from "../../utils/csvGenerator";
 
 const MainForm = ({ projects, monthOptions, onSearch }) => {
-  const { setProject, setSelectedMonth, tasks, loading, canSearch, canExport } =
+  const { setProject, fromDate, toDate, tasks, loading, canSearch, canExport } =
     useSearchContext();
 
   return (
@@ -16,35 +16,35 @@ const MainForm = ({ projects, monthOptions, onSearch }) => {
         onChange={setProject} // ✅ uso directo desde contexto
       />
 
-      <FiltersPanel
-        monthOptions={monthOptions}
-        onMonthChange={setSelectedMonth}
-      />
+      <FiltersPanel monthOptions={monthOptions} />
 
-      <Inline space="space.100" alignBlock="center" alignInline="end">
-        {!loading ? (
+      <Inline space="space.100" alignBlock="center" alignInline="start">
+        <Box paddingBlockEnd="space.300" paddingBlockStart="space.300">
+          {!loading ? (
+            <Button
+              padding="space.200"
+              isDisabled={!canSearch}
+              appearance={canSearch ? "primary" : "default"}
+              onClick={onSearch}
+            >
+              Buscar tareas
+            </Button>
+          ) : (
+            <LoadingButton appearance="primary" isLoading>
+              Cargando
+            </LoadingButton>
+          )}
+        </Box>
+        <Box paddingBlockEnd="space.300" paddingBlockStart="space.300"> 
           <Button
-            padding="space.200"
-            isDisabled={!canSearch}
-            appearance={canSearch ? "primary" : "default"}
-            onClick={onSearch}
+            paddingTop="space.200"
+            isDisabled={!canExport}
+            appearance={canExport ? "primary" : "default"}
+            onClick={() => exportDetailedWorklogsAsCSV(tasks, fromDate, toDate)}
           >
-            Buscar tareas
+            Exportar a CSV
           </Button>
-        ) : (
-          <LoadingButton appearance="primary" isLoading>
-            Cargando
-          </LoadingButton>
-        )}
-
-        <Button
-          paddingTop="space.200"
-          isDisabled={!canExport}
-          appearance={canExport ? "primary" : "default"}
-          onClick={() => exportDetailedWorklogsAsCSV(tasks)}
-        >
-          Exportar a CSV
-        </Button>
+        </Box>
       </Inline>
     </Box>
   );

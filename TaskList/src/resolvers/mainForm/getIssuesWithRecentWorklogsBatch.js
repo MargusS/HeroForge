@@ -1,13 +1,31 @@
 import api, { route } from "@forge/api";
-import { getDateRangeForMonth, getStartDateForPreviousMonth } from "./utils/datesConverter";
+import {
+  getDateRangeForMonth,
+  getStartDateForPreviousMonth,
+} from "../utils/datesConverter";
 
-export const getIssuesWithRecentWorklogsBatch = async ({ projectKey, startAt, batchSize, month, year }) => {
+export const getIssuesWithRecentWorklogsBatch = async ({
+  projectKey,
+  startAt,
+  batchSize,
+  fromDate,
+  toDate,
+  billingType,
+}) => {
   const { value } = projectKey;
   if (!value) return [];
 
-  const fromDate = getStartDateForPreviousMonth(year, month);
-  const jql = `project = "${value}" AND created >= "${fromDate}" ORDER BY key DESC`;
-  const fields = ["summary", "project", "issuetype", "parent", "customfield_10154", "customfield_10882", "customfield_10386", "customfield_10221"];
+  let jql = `project = "${value}" AND created >= "${fromDate}" AND created <= "${toDate}" ORDER BY key DESC`;
+  const fields = [
+    "summary",
+    "project",
+    "issuetype",
+    "parent",
+    "customfield_10154",
+    "customfield_10882",
+    "customfield_10386",
+    "customfield_10221",
+  ];
 
   const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
     method: "POST",
@@ -18,17 +36,21 @@ export const getIssuesWithRecentWorklogsBatch = async ({ projectKey, startAt, ba
   const data = await response.json();
   const issues = data.issues || [];
 
-  const { firstDay, lastDay } = getDateRangeForMonth(year, month);
   const filteredIssues = [];
+
+  const formattedFromDate = new Date(fromDate);
+  const formattedToDate = new Date(toDate);
 
   for (const issue of issues) {
     try {
-      const res = await api.asUser().requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
+      const res = await api
+        .asUser()
+        .requestJira(route`/rest/api/3/issue/${issue.key}/worklog`);
       const worklogData = await res.json();
 
       const recentLogs = worklogData.worklogs.filter((log) => {
         const logDate = new Date(log.started);
-        return logDate >= firstDay && logDate <= lastDay;
+        return logDate >= formattedFromDate && logDate <= formattedToDate;
       });
 
       if (recentLogs.length > 0) {

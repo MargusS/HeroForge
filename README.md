@@ -125,4 +125,4 @@ forge install --upgrade
 
 ## 🙌 Credits
 
-Developed by the BitBox internal team.
+Developed by Agustin Marani for BitBox internal team.

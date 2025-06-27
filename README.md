@@ -1,33 +1,33 @@
 # TaskList – Jira Forge App
 
-**TaskList** es una aplicación desarrollada con [Atlassian Forge](https://developer.atlassian.com/platform/forge/) que permite consultar y exportar los partes de trabajo (worklogs) de Jira, filtrando por distintos criterios clave como proyecto, fechas, tipo de facturación o SOW.
+**TaskList** is a [Atlassian Forge](https://developer.atlassian.com/platform/forge/) application that allows you to query and export Jira worklogs, filtering by key criteria such as project, date range, billing type, and SOW.
 
 ---
 
-## 🚀 Funcionalidades principales
+## 🚀 Main Features
 
-- Búsqueda de tareas con worklogs por proyecto y rango de fechas.
-- Filtros adicionales: tipo de facturación, equipo y SOW.
-- Visualización agrupada por día.
-- Exportación de los resultados a CSV.
-- Presets rápidos de fecha: "Mes actual", "Mes anterior".
+- Search issues with worklogs by project and date range.
+- Additional filters: billing type, team, and SOW.
+- Grouped view of worklogs by day.
+- Export results to CSV.
+- Quick date presets: "Current month", "Previous month".
 
 ---
 
-## 📁 Estructura del proyecto
+## 📁 Project Structure
 
 ```
 src/
 ├── frontend/
 │   ├── components/
 │   │   ├── mainForm/
-│   │   │   ├── filters/         # Filtros como SOW, tipo de facturación, fechas
-│   │   │   └── MainForm.jsx     # Formulario principal
-│   │   └── taskList/            # Lista y agrupación de tareas
+│   │   │   ├── filters/         # Filters like SOW, billing type, date pickers
+│   │   │   └── MainForm.jsx     # Main form
+│   │   └── taskList/            # Task grouping and rendering
 │   ├── context/
-│   │   └── SearchContext.jsx    # Estado global para filtros y resultados
+│   │   └── SearchContext.jsx    # Global state for filters and tasks
 │   ├── hooks/
-│   │   └── useSearchTasks.jsx   # Lógica de búsqueda en lotes
+│   │   └── useSearchTasks.jsx   # Batch search logic
 │   └── App.jsx / ProviderApp.jsx
 │
 ├── resolvers/
@@ -41,15 +41,15 @@ src/
 
 ---
 
-## 🧪 Requisitos y ejecución
+## 🧪 Requirements & Run
 
-### 🔧 Requisitos
+### 🔧 Requirements
 
 - Node.js LTS
 - Atlassian Forge CLI (`npm install -g @forge/cli`)
-- Permisos de admin en tu instancia de Jira (para instalación y scopes)
+- Jira admin permissions (to install and authorize scopes)
 
-### ▶️ Ejecutar localmente
+### ▶️ Run locally
 
 ```bash
 forge tunnel
@@ -57,7 +57,7 @@ forge tunnel
 
 ---
 
-## 🛠️ Scopes utilizados
+## 🛠️ Used Scopes
 
 ```yaml
 permissions:
@@ -67,27 +67,22 @@ permissions:
     - manage:jira-configuration
 ```
 
-> `manage:jira-configuration` se usa para recuperar dinámicamente las opciones del campo personalizado de tipo de facturación.
+> `manage:jira-configuration` is used to dynamically retrieve options for the billing type custom field.
 
 ---
 
-## 🧩 Notas adicionales
+## 🧩 Additional Notes
 
-- Los filtros de fecha se gestionan con `DatePicker` y botones de presets.
-- Los datos se recuperan en lotes (`batching`) para evitar límites del API.
-- El CSV se genera con los datos visibles y usa el rango de fechas como nombre.
-
----
-
-## 📤 Exportación CSV
-
-El botón de exportación aparece tras realizar la búsqueda si hay resultados. El nombre del archivo incluye el rango de fechas (`fromDate_to_toDate.csv`).
+- Date filters use two `DatePicker` fields with quick preset buttons.
+- Issues are retrieved in batches to avoid API limits.
+- CSV files include the selected date range in the filename.
 
 ---
 
-## 🙌 Créditos
+## 📤 CSV Export
 
-Desarrollado por el equipo interno de BitBox.
+The export button becomes available once search results are loaded.  
+The file will be named based on the date range: `worklogs_YYYY-MM-DD_to_YYYY-MM-DD.csv`.
 
 ---
 
@@ -112,7 +107,7 @@ npm install
 forge tunnel
 ```
 
-This allows you to test the app live in your connected Jira Cloud instance.
+This allows live testing connected to your Jira Cloud instance.
 
 ### 4. Deploy to development or production
 
@@ -125,3 +120,9 @@ forge deploy --environment development
 ```bash
 forge install --upgrade
 ```
+
+---
+
+## 🙌 Credits
+
+Developed by the BitBox internal team.

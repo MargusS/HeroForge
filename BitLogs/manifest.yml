@@ -1,0 +1,24 @@
+modules:
+  jira:globalPage:
+    - key: bitlogs-hello-world-global-page
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: BitLogs
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/3317602d-0156-4f30-8f04-c0fb55d45c6c
+permissions:
+  scopes:
+    - manage:jira-configuration
+    - read:jira-work

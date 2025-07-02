@@ -2,9 +2,6 @@ export const getReferenceKeyAndSummary = (task, allTasks) => {
   const isSubtask = task.fields?.issuetype?.name === "Subtask";
   const parent = task.fields?.parent;
 
-  console.log("Task:", task);
-  console.log(allTasks);
-
   let base = task;
 
   if (isSubtask) {

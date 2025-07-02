@@ -9,15 +9,13 @@ const buildJqlFromFilters = ({ ids, project, sow, billingType }) => {
     conditions.push(`project = "${project.value}"`);
   }
 
-  console.log(sow, "SOW en JQL");
   if (sow) {
-    // Reemplaza por el campo real si usas customfield
     conditions.push(`"SOW Number[Short text]" ~ "${sow}"`);
   }
 
-  //   if (billingType && billingType !== "ALL") {
-  //     conditions.push(`"Billing Type" = "${billingType}"`);
-  //   }
+  if (billingType && billingType.label !== "Ninguno") {
+    conditions.push(`"Billing Type[Dropdown]" = "${billingType.label}"`);
+  }
 
   return conditions.join(" AND ");
 };

@@ -39,7 +39,7 @@ const BillingTypeSelector = () => {
         placeholder={
           !project ? "Selecciona un proyecto" : "Selecciona una opción"
         }
-        onChange={(e) => setBillingType(e?.value)}
+        onChange={(e) => setBillingType(e)}
         value={billingType}
       />
     </Box>

@@ -9,7 +9,7 @@ export const getWorklogDetailsByIds = async ({ ids }) => {
     return [];
   }
 
-  const batchSize = 500;
+  const batchSize = 200;
   const allResults = [];
 
   for (let i = 0; i < ids.length; i += batchSize) {

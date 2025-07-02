@@ -12,7 +12,7 @@ const FiltersPanel = () => {
         <Select id="team-select" placeholder="Selecciona un equipo" />
       </Box> */}
       <SowSelector />
-      {/* <BillingTypeSelector /> */}
+      <BillingTypeSelector />
     </Inline>
   );
 };

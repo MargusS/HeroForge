@@ -20,10 +20,14 @@ const SowSelector = () => {
     fetchSows();
   }, [project]);
 
-  const options = sows.map((sow) => ({
-    label: `${sow.key} - ${sow.summary}`,
-    value: sow.key,
-  }));
+  const options = [
+    { label: "Ninguno", value: null }, // opción para restablecer
+    ...sows.map((sow) => ({
+      label: `${sow.key} - ${sow.summary}`,
+      value: sow.key,
+      sow: sow.key, // compatibilidad con backend
+    })),
+  ];
 
   return (
     <Box paddingBlockEnd="space.200" xcss={{ width: "100%" }}>

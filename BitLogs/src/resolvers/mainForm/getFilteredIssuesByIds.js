@@ -1,6 +1,6 @@
 import api, { route } from "@forge/api";
 
-const buildJqlFromFilters = ({ ids, project, sowKey, billingType }) => {
+const buildJqlFromFilters = ({ ids, project, sow, billingType }) => {
   if (!ids || ids.length === 0) return "";
 
   const conditions = [`id in (${ids.join(",")})`]; // usamos IDs directamente
@@ -9,10 +9,10 @@ const buildJqlFromFilters = ({ ids, project, sowKey, billingType }) => {
     conditions.push(`project = "${project.value}"`);
   }
 
-  console.log("🔍 SOW Key:", sowKey);
-  if (sowKey) {
+  console.log(sow, "SOW en JQL");
+  if (sow) {
     // Reemplaza por el campo real si usas customfield
-    conditions.push(`"SOW Number[Short text]" ~ "${sowKey}"`);
+    conditions.push(`"SOW Number[Short text]" ~ "${sow}"`);
   }
 
   //   if (billingType && billingType !== "ALL") {
@@ -33,7 +33,7 @@ const chunkArray = (array, size) => {
 export const getFilteredIssuesByIds = async ({
   ids,
   project,
-  sowKey,
+  sow,
   billingType,
 }) => {
   if (!Array.isArray(ids) || ids.length === 0) {
@@ -46,10 +46,10 @@ export const getFilteredIssuesByIds = async ({
     "issuetype",
     "project",
     "parent",
-    "customfield_10154", // SOW
+    "customfield_10154",
     "customfield_10882", // Billing Type
-    "customfield_10386", // Equipo
-    "customfield_10221",
+    "customfield_10386",
+    "customfield_10221", // SOW
   ];
 
   const chunks = chunkArray(ids, 250);
@@ -59,7 +59,7 @@ export const getFilteredIssuesByIds = async ({
     const jql = buildJqlFromFilters({
       ids: chunk,
       project,
-      sowKey,
+      sow,
       billingType,
     });
     console.log("🔍 JQL generado:", jql);

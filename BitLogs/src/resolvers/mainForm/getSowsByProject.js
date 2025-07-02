@@ -5,7 +5,7 @@ export const getSowsByProject = async ({ payload }) => {
   if (!value) return [];
 
   const jql = `project = "${value}" AND issuetype = "SOW" ORDER BY created DESC`;
-  const fields = ["summary", "key"];
+  const fields = ["summary", "key","customfield_10221"]; 
 
   try {
     const response = await api.asUser().requestJira(route`/rest/api/3/search`, {
@@ -28,6 +28,7 @@ export const getSowsByProject = async ({ payload }) => {
     return data.issues.map(({ key, fields }) => ({
       key,
       summary: fields.summary,
+	  sow: fields.customfield_10221
     }));
   } catch (error) {
     console.error("Error fetching SOWs:", error);

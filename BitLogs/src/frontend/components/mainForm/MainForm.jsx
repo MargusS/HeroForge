@@ -16,7 +16,7 @@ const MainForm = ({ projects, monthOptions }) => {
     <Box backgroundColor="neutral.subtle">
       <ProjectSelector
         projects={projects}
-        onChange={setProject} // ✅ uso directo desde contexto
+        onChange={setProject}
       />
 
       <FiltersPanel monthOptions={monthOptions} />
@@ -50,21 +50,6 @@ const MainForm = ({ projects, monthOptions }) => {
             Exportar a CSV
           </Button>
         </Box>
-        {/* <Box paddingBlockEnd="space.300" paddingBlockStart="space.300">
-          {loading ? (
-            <LoadingButton appearance="default" isLoading>
-              Cargando logs...
-            </LoadingButton>
-          ) : (
-            <Button
-              onClick={async () => {
-                const result = await fetchWorklogs();
-              }}
-            >
-              🧪 Ver Worklog IDs
-            </Button>
-          )}
-        </Box> */}
       </Inline>
     </Box>
   );

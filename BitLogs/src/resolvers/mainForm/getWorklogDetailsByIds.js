@@ -9,26 +9,35 @@ export const getWorklogDetailsByIds = async ({ ids }) => {
     return [];
   }
 
-  try {
-    const response = await api
-      .asUser()
-      .requestJira(route`/rest/api/3/worklog/list`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
-      });
+  const batchSize = 200;
+  const allResults = [];
 
-    const data = await response.json();
+  for (let i = 0; i < ids.length; i += batchSize) {
+    const batch = ids.slice(i, i + batchSize);
 
-    if (!Array.isArray(data)) {
-      console.error("⚠️ Formato inesperado:", data);
-      return [];
+    try {
+      const response = await api
+        .asUser()
+        .requestJira(route`/rest/api/3/worklog/list`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: batch }),
+        });
+
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        console.error("⚠️ Formato inesperado en batch:", data);
+        continue;
+      }
+
+      console.log(`📦 Batch ${i / batchSize + 1}: ${data.length} logs`);
+      allResults.push(...data);
+    } catch (error) {
+      console.error(`❌ Error en batch ${i / batchSize + 1}:`, error);
     }
-
-    console.log(`📦 Detalles de ${data.length} logs recibidos`);
-    return data;
-  } catch (error) {
-    console.error("❌ Error al recuperar detalles de logs:", error);
-    return [];
   }
+
+  console.log(`✅ Total de logs recibidos: ${allResults.length}`);
+  return allResults;
 };

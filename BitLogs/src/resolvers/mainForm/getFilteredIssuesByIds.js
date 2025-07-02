@@ -1,6 +1,6 @@
 import api, { route } from "@forge/api";
 
-const buildJqlFromFilters = ({ ids, project, sowKey, billingType }) => {
+const buildJqlFromFilters = ({ ids, project, sow, billingType }) => {
   if (!ids || ids.length === 0) return "";
 
   const conditions = [`id in (${ids.join(",")})`]; // usamos IDs directamente
@@ -9,14 +9,13 @@ const buildJqlFromFilters = ({ ids, project, sowKey, billingType }) => {
     conditions.push(`project = "${project.value}"`);
   }
 
-  //   if (sowKey) {
-  //     // Reemplaza por el campo real si usas customfield
-  //     conditions.push(`"SOW[Dropdown]" = "${sowKey}"`);
-  //   }
+  if (sow) {
+    conditions.push(`"SOW Number[Short text]" ~ "${sow}"`);
+  }
 
-  //   if (billingType && billingType !== "ALL") {
-  //     conditions.push(`"Billing Type" = "${billingType}"`);
-  //   }
+  if (billingType && billingType.label !== "Ninguno") {
+    conditions.push(`"Billing Type[Dropdown]" = "${billingType.label}"`);
+  }
 
   return conditions.join(" AND ");
 };
@@ -32,7 +31,7 @@ const chunkArray = (array, size) => {
 export const getFilteredIssuesByIds = async ({
   ids,
   project,
-  sowKey,
+  sow,
   billingType,
 }) => {
   if (!Array.isArray(ids) || ids.length === 0) {
@@ -45,10 +44,10 @@ export const getFilteredIssuesByIds = async ({
     "issuetype",
     "project",
     "parent",
-    "customfield_10154", // SOW
+    "customfield_10154",
     "customfield_10882", // Billing Type
-    "customfield_10386", // Equipo
-    "customfield_10221",
+    "customfield_10386",
+    "customfield_10221", // SOW
   ];
 
   const chunks = chunkArray(ids, 250);
@@ -58,7 +57,7 @@ export const getFilteredIssuesByIds = async ({
     const jql = buildJqlFromFilters({
       ids: chunk,
       project,
-      sowKey,
+      sow,
       billingType,
     });
     console.log("🔍 JQL generado:", jql);
@@ -72,7 +71,7 @@ export const getFilteredIssuesByIds = async ({
           body: JSON.stringify({
             jql,
             fields,
-            maxResults: 250, 
+            maxResults: 250,
           }),
         });
 

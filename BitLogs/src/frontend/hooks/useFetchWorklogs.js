@@ -22,53 +22,64 @@ const useFetchWorklogs = () => {
     try {
       setLoading(true);
 
+      const now = new Date();
       // Paso 1: obtener IDs de logs entre las fechas
-      const worklogIds = await invoke("getWorklogsInDateRange", {
+      const { batches } = await invoke("getWorklogsInDateRange", {
         fromDate: Date.parse(fromDate),
-        toDate: Date.parse(toDate),
+        toDate: new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() + 5
+        ).getTime(), // +5 days
       });
 
-      if (worklogIds.length === 0) {
+      if (!batches || batches.length === 0) {
         console.log("🟡 No se encontraron worklogs");
         setTasks([]);
         return;
       }
 
-      // Paso 2: obtener detalles de esos logs
-      const worklogs = await invoke("getWorklogDetailsByIds", {
-        ids: worklogIds,
-      });
+      const endOfDay = new Date(Date.parse(toDate));
+      endOfDay.setHours(23, 59, 59, 999);
 
-      // Paso 3: filtrar logs por campo 'started' entre fromDate y toDate
-      const filteredWorklogs = worklogs.filter((log) => {
-        const started = new Date(log.started).getTime();
-        return started >= Date.parse(fromDate) && started <= Date.parse(toDate);
-      });
+      const allWorklogs = [];
 
-      // Paso 4: extraer IDs únicos de issues
+      // Paso 2: procesar batch por batch
+      for (const batch of batches) {
+        const details = await invoke("getWorklogDetailsByIds", { ids: batch });
+
+        const filtered = details.filter((log) => {
+          const started = new Date(log.started).getTime();
+          return (
+            started >= Date.parse(fromDate) && started <= endOfDay.getTime()
+          );
+        });
+
+        allWorklogs.push(...filtered);
+      }
+
+      // Paso 3: extraer IDs únicos de issues
       const issueIds = [
-        ...new Set(filteredWorklogs.map((log) => log.issueId).filter(Boolean)),
+        ...new Set(allWorklogs.map((log) => log.issueId).filter(Boolean)),
       ];
 
-      // Paso 5: aplicar filtros adicionales vía JQL en el backend
+      // Paso 4: aplicar filtros adicionales vía JQL en el backend
       const filteredIssues = await invoke("getFilteredIssuesByIds", {
         ids: issueIds,
         project,
-        sowKey: selectedSow?.key || null,
+        sow: selectedSow?.sow || null,
         billingType,
       });
 
-      // Paso 6: mapear las issues a sus logs
+      // Paso 5: mapear las issues a sus logs
       const issueMap = new Map(filteredIssues.map((i) => [i.id, i]));
 
-      const enrichedWorklogs = filteredWorklogs
-        .filter((log) => issueMap.has(log.issueId)) // solo logs con issue válida
+      const enrichedWorklogs = allWorklogs
+        .filter((log) => issueMap.has(log.issueId))
         .map((log) => ({
           ...log,
           issue: issueMap.get(log.issueId),
         }));
-
-      console.log(enrichedWorklogs);
 
       setTasks(enrichedWorklogs);
     } catch (err) {

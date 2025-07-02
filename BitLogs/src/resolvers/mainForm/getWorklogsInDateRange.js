@@ -3,8 +3,12 @@ import api, { route } from "@forge/api";
 /**
  * Recupera todos los worklogs actualizados entre fromDate y toDate (en milisegundos UNIX epoch).
  */
-export const getWorklogsInDateRange = async ({ fromDate, toDate }) => {
 
+const chunkArray = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+export const getWorklogsInDateRange = async ({ fromDate, toDate }) => {
   const collectedIds = [];
   let nextSince = fromDate;
   let keepFetching = true;
@@ -35,6 +39,10 @@ export const getWorklogsInDateRange = async ({ fromDate, toDate }) => {
     nextSince = url.searchParams.get("since");
   }
 
-  console.log("✅ Worklog IDs totales:", collectedIds.length);
-  return collectedIds;
+  const batches = chunkArray(collectedIds, 500);
+
+  console.log(
+    `✅ Total worklogs: ${collectedIds.length}, Batches: ${batches.length}`
+  );
+  return { batches };
 };

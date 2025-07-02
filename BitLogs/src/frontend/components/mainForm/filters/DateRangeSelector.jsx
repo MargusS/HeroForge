@@ -16,7 +16,7 @@ const DateRangeSelector = () => {
   const setThisMonth = () => {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth(), 1);
-    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const last = new Date(Date.UTC(now.getFullYear(), now.getMonth() + 1, 1));
     setFromDate(first.toISOString().split("T")[0]);
     setToDate(last.toISOString().split("T")[0]);
   };
@@ -24,7 +24,7 @@ const DateRangeSelector = () => {
   const setLastMonth = () => {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const last = new Date(now.getFullYear(), now.getMonth(), 0);
+    const last = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
     setFromDate(first.toISOString().split("T")[0]);
     setToDate(last.toISOString().split("T")[0]);
   };

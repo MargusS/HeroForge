@@ -17,8 +17,8 @@ export const getSowsByProject = async ({ payload }) => {
         fields,
       }),
     });
-
     const data = await response.json();
+	console.log(data);
 
     if (!data || !Array.isArray(data.issues)) {
       console.error("Respuesta inesperada de Jira:", data);

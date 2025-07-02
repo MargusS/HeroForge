@@ -22,10 +22,15 @@ const useFetchWorklogs = () => {
     try {
       setLoading(true);
 
+      const now = new Date();
       // Paso 1: obtener IDs de logs entre las fechas
       const worklogIds = await invoke("getWorklogsInDateRange", {
         fromDate: Date.parse(fromDate),
-        toDate: Date.parse(toDate),
+        toDate: new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() + 5
+        ).getTime(), // +5 days
       });
 
       if (worklogIds.length === 0) {
@@ -39,10 +44,12 @@ const useFetchWorklogs = () => {
         ids: worklogIds,
       });
 
+      const endOfDay = new Date(Date.parse(toDate));
+      endOfDay.setHours(23, 59, 59, 999);
       // Paso 3: filtrar logs por campo 'started' entre fromDate y toDate
       const filteredWorklogs = worklogs.filter((log) => {
         const started = new Date(log.started).getTime();
-        return started >= Date.parse(fromDate) && started <= Date.parse(toDate);
+        return started >= Date.parse(fromDate) && started <= endOfDay.getTime();
       });
 
       // Paso 4: extraer IDs únicos de issues
@@ -50,6 +57,7 @@ const useFetchWorklogs = () => {
         ...new Set(filteredWorklogs.map((log) => log.issueId).filter(Boolean)),
       ];
 
+	  console.log(selectedSow);
       // Paso 5: aplicar filtros adicionales vía JQL en el backend
       const filteredIssues = await invoke("getFilteredIssuesByIds", {
         ids: issueIds,

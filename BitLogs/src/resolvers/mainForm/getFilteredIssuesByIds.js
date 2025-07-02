@@ -9,10 +9,11 @@ const buildJqlFromFilters = ({ ids, project, sowKey, billingType }) => {
     conditions.push(`project = "${project.value}"`);
   }
 
-  //   if (sowKey) {
-  //     // Reemplaza por el campo real si usas customfield
-  //     conditions.push(`"SOW[Dropdown]" = "${sowKey}"`);
-  //   }
+  console.log("🔍 SOW Key:", sowKey);
+  if (sowKey) {
+    // Reemplaza por el campo real si usas customfield
+    conditions.push(`"SOW Number[Short text]" ~ "${sowKey}"`);
+  }
 
   //   if (billingType && billingType !== "ALL") {
   //     conditions.push(`"Billing Type" = "${billingType}"`);
@@ -72,7 +73,7 @@ export const getFilteredIssuesByIds = async ({
           body: JSON.stringify({
             jql,
             fields,
-            maxResults: 250, 
+            maxResults: 250,
           }),
         });
 

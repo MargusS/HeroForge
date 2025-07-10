@@ -1,5 +1,6 @@
 import { parseTimeSpentToDecimal } from "./timeSpentFormatter.js";
 import { getReferenceKeyAndSummary } from "./epicReferenceFormatter.js";
+import * as XLSX from "xlsx";
 
 const safe = (val) => {
   const str = val ? String(val) : "";
@@ -12,21 +13,19 @@ const safe = (val) => {
 export const exportDetailedWorklogsAsCSV = (tasks, fromDate, toDate) => {
   if (!tasks || tasks.length === 0) return;
 
-  const rows = [
-    [
-      "Time Spent",
-      "Start Date",
-      "Author",
-      "Author's Account Id",
-      "Project Name",
-      "Task Key",
-      "Task Summary",
-      "Issue Type",
-      "Billing Type",
-      "Helpdesk",
-      "Requesting project",
-      "SOW Number",
-    ],
+  const headers = [
+    "Time Spent",
+    "Start Date",
+    "Author",
+    "Author's Account Id",
+    "Project Name",
+    "Task Key",
+    "Task Summary",
+    "Issue Type",
+    "Billing Type",
+    "Helpdesk",
+    "Requesting project",
+    "SOW Number",
   ];
 
   const issueMap = new Map();
@@ -36,38 +35,46 @@ export const exportDetailedWorklogsAsCSV = (tasks, fromDate, toDate) => {
     }
   });
 
-  tasks.forEach((log) => {
+  const rows = tasks.map((log) => {
     const issue = log.issue || {};
     const fields = issue.fields || {};
-
     const { key: keyReference, summary: summaryReference } =
       getReferenceKeyAndSummary(issue, issueMap);
 
-    rows.push([
-      safe(parseTimeSpentToDecimal(log.timeSpent)),
-      safe(log.started?.split("T")[0]),
-      safe(log.author?.displayName),
-      safe(log.author?.accountId),
-      safe(fields?.project?.name),
-      safe(keyReference || issue.key),
-      safe(summaryReference || fields?.summary),
-      safe(fields?.issuetype?.name),
-      safe(fields?.customfield_10154?.value), // SOW
-      safe(fields?.customfield_10882), // Billing Type
-      safe(fields?.customfield_10386), // Helpdesk
-      safe(fields?.customfield_10221), // Requesting project
-    ]);
+    return [
+      parseTimeSpentToDecimal(log.timeSpent),
+      log.started?.split("T")[0],
+      log.author?.displayName,
+      log.author?.accountId,
+      fields?.project?.name,
+      keyReference || issue.key,
+      summaryReference || fields?.summary,
+      fields?.issuetype?.name,
+      fields?.customfield_10882, // Billing Type
+      fields?.customfield_10386, // Helpdesk
+      fields?.customfield_10221, // Requesting project
+      fields?.customfield_10154?.value, // SOW Number
+    ];
   });
 
-  const csvContent = rows.map((r) => r.join(",")).join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv" });
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Worklogs");
+
+  const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+  const blob = new Blob([wbout], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = url;
   const formattedFrom = new Date(fromDate).toISOString().split("T")[0];
   const formattedTo = new Date(toDate).toISOString().split("T")[0];
-  link.download = `worklogs_${formattedFrom}_to_${formattedTo}.csv`;
+  link.href = url;
+  link.download = `worklogs_${formattedFrom}_to_${formattedTo}.xlsx`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };

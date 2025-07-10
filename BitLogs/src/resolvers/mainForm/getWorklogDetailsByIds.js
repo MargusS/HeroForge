@@ -31,7 +31,6 @@ export const getWorklogDetailsByIds = async ({ ids }) => {
         continue;
       }
 
-      console.log(`📦 Batch ${i / batchSize + 1}: ${data.length} logs`);
       allResults.push(...data);
     } catch (error) {
       console.error(`❌ Error en batch ${i / batchSize + 1}:`, error);

@@ -34,11 +34,11 @@ export const getFilteredIssuesByIds = async ({
   sow,
   billingType,
 }) => {
+  console.log("SOW: " + sow);
   if (!Array.isArray(ids) || ids.length === 0) {
     console.warn("⚠️ No se pasaron IDs");
     return [];
   }
-
   const fields = [
     "summary",
     "issuetype",

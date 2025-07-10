@@ -7,10 +7,10 @@ export const useSearchContext = () => useContext(SearchContext);
 
 export const SearchProvider = ({ children }) => {
   const [project, setProject] = useState("");
-  const [selectedSow, setSelectedSow] = useState(null);
+  const [selectedSow, setSelectedSow] = useState({ label: "Ninguno", value: null });
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-  const [billingType, setBillingType] = useState("ALL");
+  const [billingType, setBillingType] = useState({ label: "Ninguno", value: null });
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
 

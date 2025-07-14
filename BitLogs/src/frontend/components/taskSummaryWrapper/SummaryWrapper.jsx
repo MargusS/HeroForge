@@ -27,8 +27,6 @@ const SummaryWrapper = ({ tasks }) => {
       }
     }
 
-    console.log("Procesando worklogs para la tarea:", summaryMap);
-
     const result = Object.values(summaryMap).map(
       ({ key, summary, timeSpent }) => ({
         key,
@@ -63,19 +61,18 @@ const SummaryWrapper = ({ tasks }) => {
     <Box
       xcss={{
         width: "70%",
-        padding: "space.200",
+        padding: "space.100",
       }}
     >
-      {entries.map((entry) => (
-        <SummaryEntry entry={entry} />
+      {entries.map((entry, index) => (
+        <SummaryEntry entry={entry} index={index} />
       ))}
 
       <Box
-        padding="space.100"
         marginBlockStart="space.200"
         borderTopWidth="1"
         borderColor="color.border"
-        backgroundColor="color.background.brand.subtlest"
+        backgroundColor="color.background.accent.teal.subtler"
       >
         <Inline
           space="space.100"
@@ -84,10 +81,10 @@ const SummaryWrapper = ({ tasks }) => {
           spread="space-between"
         >
           <Box padding="space.100">
-            <Heading size="large">Total general: </Heading>
+            <Heading size="medium">Total general: </Heading>
           </Box>
           <Box padding="space.100">
-            <Heading size="large">
+            <Heading size="medium">
               {total.toFixed(2).replace(".", ",")} h
             </Heading>
           </Box>

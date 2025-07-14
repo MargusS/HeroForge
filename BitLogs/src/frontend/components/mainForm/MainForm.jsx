@@ -3,7 +3,7 @@ import { Box, Button, Inline, LoadingButton } from "@forge/react";
 import ProjectSelector from "./filters/ProjectSelector";
 import FiltersPanel from "./filters/FiltersPanel";
 import { useSearchContext } from "../../context/SearchContext";
-import { exportDetailedWorklogsAsCSV } from "../../utils/csvGenerator";
+import { exportDetailedWorklogsAsCSV } from "../../utils/excelGenerator";
 import useFetchWorklogs from "../../hooks/useFetchWorklogs";
 
 const MainForm = ({ projects, monthOptions }) => {
@@ -47,7 +47,7 @@ const MainForm = ({ projects, monthOptions }) => {
             appearance={canExport ? "primary" : "default"}
             onClick={() => exportDetailedWorklogsAsCSV(tasks, fromDate, toDate)}
           >
-            Exportar a CSV
+            Exportar Excel
           </Button>
         </Box>
       </Inline>

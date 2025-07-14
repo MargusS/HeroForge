@@ -50,10 +50,11 @@ export const exportDetailedWorklogsAsCSV = (tasks, fromDate, toDate) => {
       keyReference || issue.key,
       summaryReference || fields?.summary,
       fields?.issuetype?.name,
-      fields?.customfield_10882, // Billing Type
-      fields?.customfield_10386, // Helpdesk
-      fields?.customfield_10221, // Requesting project
-      fields?.customfield_10154?.value, // SOW Number
+      fields?.customfield_10154?.value, // Billing Type
+      fields?.customfield_10882, // Helpdesk
+      fields?.customfield_10386, // Requesting project
+      fields?.customfield_10221, // SOW Number
+      ,
     ];
   });
 

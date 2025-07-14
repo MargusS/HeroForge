@@ -21,7 +21,6 @@ const App = () => {
   return (
     <>
       <MainForm projects={projects} monthOptions={monthOptions} />
-      {/* <TaskListWrapper groupedTasks={groupedTasks} /> */}
       <Tabs>
         <TabList>
           <Tab>Registros Diarios</Tab>

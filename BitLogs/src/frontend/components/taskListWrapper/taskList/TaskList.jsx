@@ -3,7 +3,12 @@ import { Box } from "@forge/react";
 import TaskGroup from "./TaskGroup";
 
 const TaskList = ({ groupedTasks }) => (
-  <Box>
+  <Box
+    xcss={{
+      width: "100%",
+	  padding: "space.200"
+    }}
+  >
     {Object.entries(groupedTasks)
       .sort(([a], [b]) => new Date(b) - new Date(a))
       .map(([date, entries]) => (

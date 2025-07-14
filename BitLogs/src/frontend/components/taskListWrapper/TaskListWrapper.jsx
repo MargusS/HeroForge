@@ -7,7 +7,7 @@ const TaskListWrapper = ({ groupedTasks }) => {
   const { loading, tasks, canSearch, canExport } = useSearchContext();
   if (loading) {
     return (
-      <Box marginTop="space.200">
+      <Box padding="space.300">
         <Text>Procesando lotes... Esto puede tardar unos segundos</Text>
       </Box>
     );
@@ -15,7 +15,7 @@ const TaskListWrapper = ({ groupedTasks }) => {
 
   if (!loading && tasks.length === 0 && !canExport && canSearch) {
     return (
-      <Box marginTop="space.200">
+      <Box padding="space.300">
         <Text>
           No se encontraron tareas con worklogs en el mes seleccionado.
         </Text>

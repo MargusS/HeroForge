@@ -1,37 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Box, Text, Inline, Heading } from "@forge/react";
 import SummaryEntry from "./SummaryEntry";
+import { getReferenceKeyAndSummary } from "../../utils/epicReferenceFormatter";
 
 const SummaryWrapper = ({ tasks }) => {
   const [entries, setEntries] = useState([]);
   const [total, setTotal] = useState(0);
+
+  // Crear el Map de tareas por ID para la función getReferenceKeyAndSummary
+  const issueMap = useMemo(() => {
+    const map = new Map();
+    for (const task of tasks) {
+      map.set(task.id, task.issue);
+    }
+    return map;
+  }, [tasks]);
 
   useEffect(() => {
     const safeTasks = Array.isArray(tasks) ? tasks : [];
 
     const summaryMap = {};
 
-    for (const task of safeTasks) {
-      const key = task.issue.key;
-      const summary = task.issue.fields?.summary || "";
-      const timeSpent = task.timeSpentSeconds || 0;
+    for (const log of safeTasks) {
+      const issue = log.issue;
+      const time = log.timeSpentSeconds || 0;
+
+      if (!issue) continue;
+
+      const { key, summary } = getReferenceKeyAndSummary(issue, issueMap);
 
       if (!summaryMap[key]) {
-        summaryMap[key] = {
-          key,
-          summary,
-          timeSpent,
-        };
-      } else {
-        summaryMap[key].timeSpent += timeSpent;
+        summaryMap[key] = { summary, totalSeconds: 0 };
       }
+
+      summaryMap[key].totalSeconds += time;
     }
 
-    const result = Object.values(summaryMap).map(
-      ({ key, summary, timeSpent }) => ({
+    const result = Object.entries(summaryMap).map(
+      ([key, { summary, totalSeconds }]) => ({
         key,
         summary,
-        totalHours: (timeSpent / 3600).toFixed(2).replace(".", ","),
+        totalHours: (totalSeconds / 3600).toFixed(2).replace(".", ","),
       })
     );
 
@@ -42,20 +51,7 @@ const SummaryWrapper = ({ tasks }) => {
 
     setEntries(result);
     setTotal(totalSum);
-  }, [tasks]);
-
-  if (entries.length === 0) {
-    return (
-      <Box
-        xcss={{
-          width: "100%",
-          padding: "space.200",
-        }}
-      >
-        <Text>No hay tareas para mostrar en el resumen.</Text>
-      </Box>
-    );
-  }
+  }, [tasks, issueMap]);
 
   return (
     <Box

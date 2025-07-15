@@ -12,9 +12,11 @@ export const getReferenceKeyAndSummary = (task, allTasks) => {
 
   const keyReference = isEpic ? base.fields?.parent?.key : base.key;
 
+  console.log(base)
+
   const summaryReference = isEpic
     ? base.fields?.parent?.fields?.summary
-    : base.summary;
+    : base.fields?.summary;
 
   return {
     key: keyReference,

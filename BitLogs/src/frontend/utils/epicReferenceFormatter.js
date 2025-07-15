@@ -12,7 +12,7 @@ export const getReferenceKeyAndSummary = (task, allTasks) => {
 
   const isGroupParent =
     parentIssueType === "Epic" ||
-    parentIssueType === "Service Request" ||
+    parentIssueType === "Service request" ||
     parentIssueType === "Support";
 
   const keyReference = isGroupParent ? base.fields?.parent?.key : base.key;

@@ -4,22 +4,30 @@ export const getReferenceKeyAndSummary = (task, allTasks) => {
 
   let base = task;
 
-  if (isSubtask) {
+  if (isSubtask && parent) {
     base = allTasks.get(parent.id);
   }
 
-  const isEpic = base.fields?.parent?.fields?.issuetype?.name === "Epic";
+  const parentIssueType = base.fields?.parent?.fields?.issuetype?.name;
 
-  const keyReference = isEpic ? base.fields?.parent?.key : base.key;
+  const isGroupParent =
+    parentIssueType === "Epic" ||
+    parentIssueType === "Service Request" ||
+    parentIssueType === "Support";
 
-  console.log(base)
+  const keyReference = isGroupParent ? base.fields?.parent?.key : base.key;
 
-  const summaryReference = isEpic
+  const summaryReference = isGroupParent
     ? base.fields?.parent?.fields?.summary
     : base.fields?.summary;
+
+  const typeReference = isGroupParent
+    ? parentIssueType
+    : base.fields?.issuetype?.name;
 
   return {
     key: keyReference,
     summary: summaryReference,
+    type: typeReference,
   };
 };

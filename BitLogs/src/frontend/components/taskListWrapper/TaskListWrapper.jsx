@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Text } from "@forge/react";
 import TaskList from "./taskList/TaskList";
 import { useSearchContext } from "../../context/SearchContext";
+import WorklogsNotFound from "../shared/WorklogsNotFound";
 
 const TaskListWrapper = ({ groupedTasks }) => {
   const { loading, tasks, canSearch, canExport } = useSearchContext();
@@ -15,11 +16,7 @@ const TaskListWrapper = ({ groupedTasks }) => {
 
   if (!loading && tasks.length === 0 && !canExport && canSearch) {
     return (
-      <Box padding="space.300">
-        <Text>
-          No se encontraron tareas con worklogs en el mes seleccionado.
-        </Text>
-      </Box>
+      <WorklogsNotFound />
     );
   }
 

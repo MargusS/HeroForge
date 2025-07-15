@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Box, Text, Inline, Heading } from "@forge/react";
 import SummaryEntry from "./SummaryEntry";
 import { getReferenceKeyAndSummary } from "../../utils/epicReferenceFormatter";
+import WorklogsNotFound from "../shared/WorklogsNotFound";
 
 const SummaryWrapper = ({ tasks }) => {
   const [entries, setEntries] = useState([]);
@@ -52,6 +53,10 @@ const SummaryWrapper = ({ tasks }) => {
     setEntries(result);
     setTotal(totalSum);
   }, [tasks, issueMap]);
+
+  if (!entries || entries.length === 0) {
+    return <WorklogsNotFound />;
+  }
 
   return (
     <Box

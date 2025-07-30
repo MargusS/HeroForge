@@ -6,40 +6,40 @@ const SearchContext = createContext();
 export const useSearchContext = () => useContext(SearchContext);
 
 export const SearchProvider = ({ children }) => {
-  const [project, setProject] = useState("");
-  const [selectedSow, setSelectedSow] = useState({ label: "Ninguno", value: null });
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
-  const [billingType, setBillingType] = useState({ label: "Ninguno", value: null });
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+	const [projects, setProjects] = useState([]);
+	const [selectedSow, setSelectedSow] = useState({ label: "Ninguno", value: null });
+	const [fromDate, setFromDate] = useState(null);
+	const [toDate, setToDate] = useState(null);
+	const [billingType, setBillingType] = useState({ label: "Ninguno", value: null });
+	const [tasks, setTasks] = useState([]);
+	const [loading, setLoading] = useState(false);
 
-  const canSearch = !!project && !!fromDate && !!toDate && !loading;
-  const canExport = tasks.length > 0 && !loading;
+	const canSearch = projects.length > 0 && !!fromDate && !!toDate && !loading;
+	const canExport = tasks.length > 0 && !loading;
 
-  const value = useMemo(
-    () => ({
-      project,
-      setProject,
-      selectedSow,
-      setSelectedSow,
-      fromDate,
-      setFromDate,
-      toDate,
-      setToDate,
-      billingType,
-      setBillingType,
-      tasks,
-      setTasks,
-      loading,
-      setLoading,
-      canSearch,
-      canExport,
-    }),
-    [project, selectedSow, fromDate, toDate, billingType, tasks, loading]
-  );
+	const value = useMemo(
+		() => ({
+			projects,
+			setProjects,
+			selectedSow,
+			setSelectedSow,
+			fromDate,
+			setFromDate,
+			toDate,
+			setToDate,
+			billingType,
+			setBillingType,
+			tasks,
+			setTasks,
+			loading,
+			setLoading,
+			canSearch,
+			canExport,
+		}),
+		[projects, selectedSow, fromDate, toDate, billingType, tasks, loading]
+	);
 
-  return (
-    <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
-  );
+	return (
+		<SearchContext.Provider value={value}>{children}</SearchContext.Provider>
+	);
 };

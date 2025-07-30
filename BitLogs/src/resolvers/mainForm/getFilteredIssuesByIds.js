@@ -1,12 +1,13 @@
 import api, { route } from "@forge/api";
 
-const buildJqlFromFilters = ({ ids, project, sow, billingType }) => {
+const buildJqlFromFilters = ({ ids, projectKeys, sow, billingType }) => {
   if (!ids || ids.length === 0) return "";
 
   const conditions = [`id in (${ids.join(",")})`]; // usamos IDs directamente
 
-  if (project) {
-    conditions.push(`project = "${project.value}"`);
+  if (projectKeys && projectKeys.length > 0) {
+    const quoted = projectKeys.map((k) => `"${k}"`).join(",");
+    conditions.push(`project IN (${quoted})`);
   }
 
   if (sow) {
@@ -30,7 +31,7 @@ const chunkArray = (array, size) => {
 
 export const getFilteredIssuesByIds = async ({
   ids,
-  project,
+  projectKeys,
   sow,
   billingType,
 }) => {
@@ -56,7 +57,7 @@ export const getFilteredIssuesByIds = async ({
   for (const chunk of chunks) {
     const jql = buildJqlFromFilters({
       ids: chunk,
-      project,
+      projectKeys,
       sow,
       billingType,
     });

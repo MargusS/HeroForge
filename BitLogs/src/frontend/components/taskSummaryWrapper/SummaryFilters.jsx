@@ -4,7 +4,7 @@ import { Box, Select } from "@forge/react";
 const ISSUE_TYPE_OPTIONS = [
   { label: "Todos", value: "ALL" },
   { label: "Epic", value: "Epic" },
-  { label: "Service Request", value: "Service Request" },
+  { label: "Service Request", value: "Service request" },
   { label: "Support", value: "Support" },
 ];
 

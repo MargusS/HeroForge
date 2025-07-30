@@ -6,7 +6,7 @@ const useFetchWorklogs = () => {
   const {
     fromDate,
     toDate,
-    project,
+    projects,
     selectedSow,
     billingType,
     setLoading,
@@ -14,7 +14,7 @@ const useFetchWorklogs = () => {
   } = useSearchContext();
 
   const fetchWorklogs = useCallback(async () => {
-    if (!fromDate || !toDate) {
+    if (!fromDate || !toDate || projects.length === 0) {
       console.warn("❗ Fechas no definidas");
       return;
     }
@@ -30,7 +30,7 @@ const useFetchWorklogs = () => {
           now.getFullYear(),
           now.getMonth(),
           now.getDate() + 5
-        ).getTime(), // +5 days
+        ).getTime(),
       });
 
       if (!batches || batches.length === 0) {
@@ -66,7 +66,7 @@ const useFetchWorklogs = () => {
       // Paso 4: aplicar filtros adicionales vía JQL en el backend
       const filteredIssues = await invoke("getFilteredIssuesByIds", {
         ids: issueIds,
-        project,
+        projectKeys: projects,
         sow: selectedSow?.sow || null,
         billingType,
       });
@@ -91,7 +91,7 @@ const useFetchWorklogs = () => {
   }, [
     fromDate,
     toDate,
-    project,
+    projects,
     selectedSow,
     billingType,
     setLoading,

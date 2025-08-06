@@ -1,10 +1,11 @@
 import Resolver from "@forge/resolver";
-import { getProjects } from "./mainForm/getProjects";
-import { getSowsByProject } from "./mainForm/getSowsByProject";
-import { getBillingTypes } from "./mainForm/getBillingTypes";
-import { getWorklogsInDateRange } from "./mainForm/getWorklogsInDateRange";
-import { getWorklogDetailsByIds } from "./mainForm/getWorklogDetailsByIds";
-import { getFilteredIssuesByIds } from "./mainForm/getFilteredIssuesByIds";
+import { getProjects } from "./main-form/getProjects";
+import { getSowsByProject } from "./main-form/getSowsByProject";
+import { getBillingTypes } from "./main-form/getBillingTypes";
+import { getWorklogsInDateRange } from "./task-search/getWorklogsInDateRange";
+import { getWorklogDetailsByIds } from "./task-search/getWorklogDetailsByIds";
+import { getFilteredIssuesByIds } from "./task-search/getFilteredIssuesByIds";
+import { getIssueByKey } from "./task-search/getIssueByKey";
 
 const resolver = new Resolver();
 
@@ -27,5 +28,9 @@ resolver.define("getSowsByProject", async ({ payload }) => {
 });
 
 resolver.define("getBillingTypes", getBillingTypes);
+
+resolver.define("getIssueByKey", async ({ payload }) =>
+  getIssueByKey({ payload })
+);
 
 export const handler = resolver.getDefinitions();

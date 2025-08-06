@@ -1,16 +1,11 @@
 import api, { route } from "@forge/api";
 
 export const getSowsByProject = async ({ payload }) => {
-  const { projectKeys } = payload;
-  if (!Array.isArray(projectKeys) || projectKeys.length === 0) return [];
+  if (payload.length === 0) return [];
 
-  const quoted = projectKeys.map((k) => `"${k}"`).join(",");
+  const quoted = payload.map((k) => `"${k}"`).join(",");
 
-  const jql = `
-    project IN (${quoted})
-    AND issuetype = "SOW"
-    ORDER BY created DESC
-  `;
+  const jql = `project IN (${quoted}) AND issuetype = "SOW" ORDER BY created DESC`;
   const fields = ["summary", "key", "customfield_10221"];
 
   try {
@@ -24,7 +19,6 @@ export const getSowsByProject = async ({ payload }) => {
       }),
     });
     const data = await response.json();
-    console.log(data);
 
     if (!data || !Array.isArray(data.issues)) {
       console.error("Respuesta inesperada de Jira:", data);
